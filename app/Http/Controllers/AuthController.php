@@ -12,8 +12,22 @@ use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
+    public function loginPage()
+    {
+        return view('auth.login');
+    }
+    public function registerPage()
+    {
+        return view('auth.register');
+    }
+    public function verifyPage()
+    {
+        return view('auth.verify');
+    }
     public function login(Request $request)
     {
+        // dd($request->all());
+
         $request->validate(
             [
                 'email' => 'required|email',
@@ -29,7 +43,7 @@ class AuthController extends Controller
                 'data' => $user,
                 'token' => $token,
             ];
-            return response()->json($response, 200);
+            return redirect('/');
         }
         return response()->json(['Error' => 'Unauthorized'], 401);
     }
@@ -57,11 +71,7 @@ class AuthController extends Controller
 
         SendEmailJob::dispatch($user->email, ['code' => $verificationCode]);
         // dd(SendEmailJob::dispatch($user->email, ['code' => $verificationCode]));
-        return response()->json([
-            'success' => true,
-            'message' => 'Registration successful. A verification code has been sent to your email.',
-
-        ], 201);
+        return redirect('/verify');
     }
 
     public function verify(Request $request)
@@ -102,15 +112,10 @@ class AuthController extends Controller
         $code->delete();
 
 
-        $token = $user->createToken('Token')->plainTextToken;
+        Auth::login($user);
 
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Verification successful.',
-            'token' => $token,
-            'user' => $user,
-        ], 200);
+        return redirect('/');
     }
 
     public function profile(Request $request)
@@ -147,5 +152,11 @@ class AuthController extends Controller
             'success' => true,
             'message' => 'A new password has been sent to your email.',
         ], 200);
+    }
+
+    public function logout()
+    {
+        Auth::logout();
+        return redirect('/userPage');
     }
 }

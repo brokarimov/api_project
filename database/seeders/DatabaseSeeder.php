@@ -22,7 +22,7 @@ class DatabaseSeeder extends Seeder
         //     'email' => 'test@example.com',
         // ]);
 
-        for ($i = 1; $i <= 10; $i++) {
+        for ($i = 1; $i <= 5; $i++) {
             Category::create([
                 'name' => [
                     'uz' => 'Bolim - ' . $i,
@@ -33,7 +33,7 @@ class DatabaseSeeder extends Seeder
         }
         $categoryIds = Category::pluck('id')->toArray(); 
 
-        for ($i = 1; $i <= 100; $i++) {
+        for ($i = 1; $i <= 50; $i++) {
             News::create([
                 'category_id' => $categoryIds[array_rand($categoryIds)], 
                 'title' => [

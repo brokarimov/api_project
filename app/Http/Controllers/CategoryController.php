@@ -11,8 +11,12 @@ class CategoryController extends Controller
 {
     public function index()
     {
-        $categories = Category::cursorPaginate(10);
-        return CategoryResource::collection($categories);
+        $categories = Category::orderBy('id', 'desc')->paginate(10);
+        return view('pages.category-index', ['models' => $categories]);
+    }
+    public function create()
+    {
+        return view('pages.category-create');
     }
 
     public function show(Category $category)
@@ -22,25 +26,18 @@ class CategoryController extends Controller
 
     public function store(Request $request)
     {
+        
         $data = $request->validate([
-            'name' => 'required',
+            'name' => 'required|array',
+            'name.*' => 'required|string|max:255',  
         ]);
 
-        $data['name'] = json_decode($data['name'], true);
-
-        if (!is_array($data['name'])) {
-            return response()->json(['error' => 'Invalid name format'], 422);
-        }
-
-        foreach ($data['name'] as $key => $value) {
-            if (!is_string($value) || strlen($value) > 255) {
-                return response()->json(['error' => 'Invalid name value'], 422);
-            }
-        }
-
+        
         $category = Category::create(['name' => $data['name']]);
-        return new CategoryResource($category);
+
+        return redirect('/');
     }
+
 
     public function delete(Category $category)
     {
